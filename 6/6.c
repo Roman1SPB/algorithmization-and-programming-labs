@@ -19,6 +19,7 @@ struct Book {
 
 struct Book* library;
 
+
 // Action 1: Just printing all book titles
 void print_library() {
     if (library_size == 0) {
@@ -47,12 +48,17 @@ void handle_input_strings(const int LIMIT, char strng[]) {
     }
 }
 
-// Action 2: Input (scanf_s) new book
-void scan_new_book() {
+
+void check_library_size() {
     if (library_size >= library_max_size) {
         library_max_size *= 2;
         library = realloc(library, sizeof(struct Book) * library_max_size);
     }
+}
+
+// Action 2: Input (scanf_s) new book
+void scan_new_book() {
+    check_library_size();
 
     printf_s("Write author name\n");
     handle_input_strings(MAX_LENGTH_AUTHOR_NAME, library[library_size].author_name);
@@ -137,24 +143,13 @@ void delete_book() {
 // Action 4: Saving all library books to file
 void write_library_to_drive() {
     FILE *fptr;
-    fptr = fopen("library_output.csv", "w");
+    fptr = fopen("library_output.txt", "w");
 
-    fprintf(fptr, "Author_name, Book_title, Year_published, Book_price\n");
     for (int i = 0; i < library_size; i++) {
-        fprintf(fptr, "%s, %s, %d, %d\n", library[i].author_name, library[i].title, library[i].year, library[i].price);
+        fprintf(fptr, "%s\n%s\n%d\n%d\n", library[i].author_name, library[i].title, library[i].year, library[i].price);
     }
     fclose(fptr);
 }  
-
-void print_menu_actions() {
-    printf("1 - Print library titles\n");
-    printf("2 - Scan new book\n");
-    printf("3 - Delete book\n");
-    printf("4 - Write library to drive\n");
-    printf("5 - Write from file\n");
-    printf("6 - Exit\n");
-}
-
 
 void write_to_library_field(int start, int end, char buff[], char field[]) {
     for (int i = start; i < end; i++) {
@@ -164,46 +159,30 @@ void write_to_library_field(int start, int end, char buff[], char field[]) {
     field[end] = '\0';
 }
 
+void change_last_char_to_null_char(char buff[]) {
+    int i = 0;
+    while (buff[i] != '\n') i++;
+    buff[i] = '\0';
+}
+
 void write_from_drive_to_library() {
     FILE *fptr;
-    fptr = fopen("library_input.csv", "r");
+    fptr = fopen("library_input.txt", "r");
 
-    char buff[MAX_TOTAL_LENGTH];
-    fgets(buff, MAX_TOTAL_LENGTH, fptr);
     int library_size_copy = library_size;
-    for (int i = library_size_copy; i < library_max_size; i++) {
-        char buff_int[32];
-        fgets(buff, MAX_TOTAL_LENGTH, fptr);
-        int count_comma = 0;
-        int start = 0;
-        for (int j = 0; j < MAX_TOTAL_LENGTH; j++) {
-            if (buff[j] == ',') {
-                count_comma++;
-                if (count_comma == 1) write_to_library_field(start, j, buff, library[i].author_name);
-                if (count_comma == 2) write_to_library_field(start, j, buff, library[i].title);
-                if (count_comma == 3) {
-                    write_to_library_field(start, j, buff, buff_int);
-                    library[i].year = atoi(buff_int);
-                }
-                if (count_comma == 4) {
-                    write_to_library_field(start, j, buff, buff_int);
-                    library[i].price = atoi(buff_int);
-                    break;
-                }
-                start = j + 1;
-            }
-
-            if (buff[j] == '\n') break;
-            
-        }
+    for (int i = library_size_copy; !feof(fptr); i++) {
+        fgets(library[i].author_name, MAX_LENGTH_AUTHOR_NAME, fptr);
+        change_last_char_to_null_char(library[i].author_name);
+        fgets(library[i].title, MAX_LENGTH_BOOK_TITLE, fptr);
+        change_last_char_to_null_char(library[i].title);
+        fscanf(fptr, "%d\n", &library[i].year);
+        fscanf(fptr, "%d\n", &library[i].price);
 
         library_size++;
+        check_library_size();
     }
-    for (int i = 0; i < MAX_LENGTH_AUTHOR_NAME; i++) {
-
-    }
-
-
+    
+    fclose(fptr);
 }
 
 int check_menu_input(int action, int handle_input_error) {
@@ -213,6 +192,14 @@ int check_menu_input(int action, int handle_input_error) {
     } else return 1;
 }
 
+void print_menu_actions() {
+    printf("1 - Print library titles\n");
+    printf("2 - Scan new book\n");
+    printf("3 - Delete book\n");
+    printf("4 - Write library to drive\n");
+    printf("5 - Write from file\n");
+    printf("6 - Exit\n");
+}
 
 // Menu actions with our library
 void menu() {
@@ -243,7 +230,7 @@ void menu() {
         case 6:
             return;
         default:
-            printf("switch error\n");
+            printf("switch error???67\n");
             break;
     }
 
@@ -251,7 +238,7 @@ void menu() {
 }
 
 void preparing_library() {
-    library = (struct Book*) malloc(sizeof(struct Book) * library_size);
+    library = (struct Book*) malloc(sizeof(struct Book) * library_max_size);
 }
 
 int main() {
