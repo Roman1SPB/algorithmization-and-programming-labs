@@ -20,7 +20,7 @@ struct Book {
 struct Book* library;
 
 
-// Action 1: Just printing all book titles
+// case 1: Just printing all book titles
 void print_library() {
     if (library_size == 0) {
         printf("There are no books in library\n");
@@ -56,7 +56,7 @@ void check_library_size() {
     }
 }
 
-// Action 2: Input (scanf_s) new book
+// case 2: Input (scanf_s) new book
 void scan_new_book() {
     check_library_size();
 
@@ -111,7 +111,7 @@ void swap_books_fields(char array1[], char array2[], int limit) {
     }
 }
 
-// Action 3: Delete book from library
+// case 3: Delete book from library
 // Actually, we just replace the last 
 // book fields to book, which we want to delete and then decresse
 // library_size by one
@@ -140,7 +140,7 @@ void delete_book() {
 
 }
 
-// Action 4: Saving all library books to file
+// case 4: Saving all library books to file
 void write_library_to_drive() {
     FILE *fptr;
     fptr = fopen("library_output.txt", "w");
@@ -165,6 +165,7 @@ void change_last_char_to_null_char(char buff[]) {
     buff[i] = '\0';
 }
 
+// case 5: get books from file(library_input.txt) to ram
 void write_from_drive_to_library() {
     FILE *fptr;
     fptr = fopen("library_input.txt", "r");
@@ -184,6 +185,7 @@ void write_from_drive_to_library() {
     
     fclose(fptr);
 }
+
 
 int check_menu_input(int action, int handle_input_error) {
     if (handle_input_error == 0 || action < 1 || action > 6) {
