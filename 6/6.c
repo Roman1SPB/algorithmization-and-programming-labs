@@ -21,7 +21,7 @@ struct Book {
 struct Book* library;
 
 int check_input(int choice, int handle_input_error, int range_from, int range_to) {
-    if (handle_input_error == 0 || choice < 1 || choice > 7) {
+    if (handle_input_error == 0 || choice < range_from || choice > range_to) {
         printf("There is input mistake\n");
         fflush(stdin);
         return 0;
@@ -146,7 +146,7 @@ void write_library_to_drive() {
     fptr = fopen("library_output.txt", "w");
 
     for (int i = 0; i < library_size; i++) {
-        fprintf(fptr, "%s\n%s\n%d\n%d\n%d\n", library[i].author, library[i].title, library[i].year, library[i].price, library[i].category);
+        fprintf(fptr, "%s\n%s\n%s\n%d\n%d\n", library[i].author, library[i].title, library[i].category, library[i].year, library[i].price);
     }
     fclose(fptr);
     printf("Library successfully saved to 'library_output.txt' file\n");
@@ -181,10 +181,10 @@ void write_from_drive_to_library() {
         change_last_char_to_null_char(library[i].author);
         fgets(library[i].title, MAX_LENGTH_BOOK_TITLE, fptr);
         change_last_char_to_null_char(library[i].title);
-        fscanf(fptr, "%d\n", &library[i].year);
-        fscanf(fptr, "%d\n", &library[i].price);
         fgets(library[i].category, MAX_LENGTH_BOOK_CATEGORY, fptr);
         change_last_char_to_null_char(library[i].title);
+        fscanf(fptr, "%d\n", &library[i].year);
+        fscanf(fptr, "%d\n", &library[i].price);
 
         library_size++;
         check_library_size();
