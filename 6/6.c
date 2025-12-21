@@ -20,10 +20,14 @@ struct Book {
 
 struct Book* library;
 
+// Check input for menu() and sort_criteria() functions,
+// where we excpect number, which correspond to command
+// (for example: 1 - print library). Such numbers 
+// must be between range_from and range_to
 int check_input(int choice, int handle_input_error, int range_from, int range_to) {
     if (handle_input_error == 0 || choice < range_from || choice > range_to) {
         printf("There is input mistake\n");
-        fflush(stdin);
+        fflush(stdin); // empty input stream, as there is trash from wrong input
         return 0;
     } else return 1;
 }
@@ -103,8 +107,8 @@ int compare_strings(void* str1, void* str2) {
 }
 
 // We return the index in library(array of struct Book)
-// otherwise, -1(if title not founded)
-int find_book_in_library(char book_title[]) {
+// otherwise, -1(if title not found)
+int find_book_in_library(const char book_title[]) {
     int string_compare_result = -1;
     for (int i = 0; i < library_size; i++) {
         string_compare_result = compare_strings(library[i].title, book_title);
@@ -131,7 +135,7 @@ void delete_book() {
     handle_input_strings(MAX_LENGTH_BOOK_TITLE, book_title);
 
     int index_book_to_delete = find_book_in_library(book_title);
-    if (index_book_to_delete == -1) printf("Title book not founded!\n");
+    if (index_book_to_delete == -1) printf("Title book not found!\n");
     else {
         if (library_size != 1) library[index_book_to_delete] = library[library_size-1];
         printf("Book successfully deleted!\n");
@@ -333,6 +337,7 @@ void preparing_library() {
 int main() {
     preparing_library();
     menu();
+    free(library);
 
     return 0;
 }
